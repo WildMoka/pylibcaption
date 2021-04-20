@@ -86,7 +86,8 @@ def str_to_eia(np.ndarray[np.uint8_t, ndim=1] srt_data):
     cdef lib.srt_cue_t* cue
     cdef lib.caption_frame_t frame
     cdef lib.srt_t* srt
-    cdef lib.sei_t sei
+    cdef lib.sei_t sei_start
+    cdef lib.sei_t sei_end
     output = []
 
     srt = lib.srt_parse(data, data_size)
@@ -98,11 +99,37 @@ def str_to_eia(np.ndarray[np.uint8_t, ndim=1] srt_data):
         # lib.caption_frame_dump(&frame)
 
         # Convert to sei
-        lib.sei_init(&sei, cue.timestamp)
-        lib.sei_from_caption_frame(&sei, &frame)
-        output.extend((get_messages_from_sei(&sei, cue.timestamp), cue.timestamp))
+        lib.sei_init(&sei_start, cue.timestamp)
+        lib.sei_from_caption_frame(&sei_start, &frame)
+        output.append((get_messages_from_sei(&sei_start, cue.timestamp), cue.timestamp, False))
         # lib.sei_dump(&sei)
+        lib.sei_init(&sei_end, cue.timestamp+cue.duration)
+        lib.sei_from_caption_clear(&sei_end)
+        output.append((get_messages_from_sei(&sei_end, cue.timestamp+cue.duration), cue.timestamp+cue.duration, True))
+
         cue = cue.next
 
     lib.srt_free(srt)
     return output
+
+def sub_to_eia(srt_data, timestamp):
+    cdef lib.caption_frame_t frame
+    cdef lib.sei_t sei
+    output = []
+
+    lib.caption_frame_from_text(&frame, srt_data)
+    lib.sei_from_caption_frame(&sei, &frame)
+    output = get_messages_from_sei(&sei, timestamp)
+
+    return output
+
+def clear_eia(timestamp):
+
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    lib.sei_from_caption_clear(&sei)
+    output = get_messages_from_sei(&sei, timestamp)
+
+    return output
+
