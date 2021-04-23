@@ -11,6 +11,7 @@ from distutils.command import build_ext
 libcaption_extension = Extension(
     name="pylibcaption",
     sources=["pylibcaption.pyx"],
+    extra_objects=["./libcaption/libcaption.a"],
     libraries=["caption"],
     library_dirs=["libcaption"],
     include_dirs=["libcaption/caption"]
