@@ -3,9 +3,28 @@ import logging
 from libc.stdint cimport int8_t, uint8_t, uint16_t, uint32_t, uint64_t, int64_t
 import numpy as np
 from six.moves import range
+from fractions import Fraction
 cimport numpy as np
 cimport c_pylibcaption as lib
 
+#Caption distribution packet table
+# currently only cc_count is used
+CDP_TABLE_PER_FRAME_RATE = {
+    Fraction(24000, 1001): {"cc_count": 25, "cea_608": 4, "cea_708": 46},
+    Fraction(24,1): {"cc_count": 25, "cea_608": 4, "cea_708": 46},
+    Fraction(25,1): {"cc_count": 24, "cea_608": 4, "cea_708": 44},
+    Fraction(30000, 1001): {"cc_count": 20, "cea_608": 4, "cea_708": 36},
+    Fraction(30,1): {"cc_count": 20, "cea_608": 4, "cea_708": 36},
+    Fraction(50,1): {"cc_count": 12, "cea_608": 2, "cea_708": 22},
+    Fraction(60000, 1001): {"cc_count": 10, "cea_608": 2, "cea_708": 18},
+    Fraction(60, 1): {"cc_count": 10, "cea_608": 2, "cea_708": 18}
+}
+
+def get_cc_count_from_rate(frame_rate):
+    if CDP_TABLE_PER_FRAME_RATE.get(frame_rate):
+        return CDP_TABLE_PER_FRAME_RATE.get(frame_rate).get("cc_count")
+    else:
+        return 20
 
 cdef class CaptionFrame:
     cdef lib.caption_frame_t frame
@@ -55,7 +74,6 @@ cdef get_messages_from_sei(lib.sei_t* sei, double timestamp):
     cdef size_t size
     cdef np.ndarray msg_output
     output = []
-
     lib.cea708_init(&cea708, timestamp)
     msg = sei.head
     while msg:
@@ -123,13 +141,45 @@ def sub_to_eia(srt_data, timestamp):
 
     return output
 
-def clear_eia(timestamp):
+def clear_eia(timestamp, frame_rate):
 
     cdef lib.sei_t sei
     output = []
     lib.sei_init(&sei, timestamp)
-    lib.sei_from_caption_clear(&sei)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.sei_for_clear(&sei, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
 
     return output
 
+def text_to_eia(text, timestamp, frame_rate):
+    cdef lib.caption_frame_t frame
+    cdef lib.sei_t sei
+    output = []
+
+    lib.caption_frame_from_text(&frame, text)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.sei_for_captions(&sei, &frame, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+
+    return output
+
+def padding(timestamp, frame_rate):
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.sei_for_padding(&sei, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+
+    return output
+
+def display_sub(timestamp, frame_rate):
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.sei_for_display(&sei, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+
+    return output

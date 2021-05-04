@@ -191,3 +191,9 @@ cdef extern from "srt.h":
     ctypedef vtt_block_t srt_cue_t
     srt_t* srt_parse(const uint8_t* data, size_t size);
     int srt_cue_to_caption_frame(srt_cue_t* cue, caption_frame_t* frame)
+
+cdef extern from "eia608_encoder.h":
+    libcaption_stauts_t sei_for_display(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_padding(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_clear(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_captions(sei_t * sei, caption_frame_t * frame, int cc_count);

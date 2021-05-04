@@ -10,7 +10,7 @@ from distutils.command import build_ext
 
 libcaption_extension = Extension(
     name="pylibcaption",
-    sources=["pylibcaption.pyx"],
+    sources=["pylibcaption.pyx", "eia608_encoder.c"],
     extra_objects=["./libcaption/libcaption.a"],
     libraries=["caption"],
     library_dirs=["libcaption"],
