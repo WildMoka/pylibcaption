@@ -20,11 +20,11 @@ CDP_TABLE_PER_FRAME_RATE = {
     Fraction(60, 1): {"cc_count": 10, "cea_608": 2, "cea_708": 18}
 }
 
+
 def get_cc_count_from_rate(frame_rate):
-    if CDP_TABLE_PER_FRAME_RATE.get(frame_rate):
-        return CDP_TABLE_PER_FRAME_RATE.get(frame_rate).get("cc_count")
-    else:
-        return 20
+    cdp_table = CDP_TABLE_PER_FRAME_RATE.get(frame_rate)
+    return cdp_table.get("cc_count") if cdp_table is not None else 20
+
 
 cdef class CaptionFrame:
     cdef lib.caption_frame_t frame

@@ -17,7 +17,7 @@ libcaption_stauts_t encode_cc(sei_t* sei, double timestamp, uint16_t cc_element,
 void sei_append(sei_t* sei, cea708_t* cea708);
 
 /*
- * Encode the end of caption command
+ * Encode the erase_display_memory and end of caption commands
  */
 libcaption_stauts_t sei_for_display(sei_t * sei, int cc_count);
 
