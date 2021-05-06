@@ -1,0 +1,3 @@
+recursive-include libcaption *.c *.c.cached *.h *.py *.txt configure configure.ac *.in makefile
+recursive-exclude libcaption CMakeCache.txt
+include *.py *.pyx *.md

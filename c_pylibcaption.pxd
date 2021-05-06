@@ -4,6 +4,9 @@ from libc.stdint cimport int8_t, uint8_t, uint16_t, uint32_t, uint64_t, int64_t
 import numpy as np
 cimport numpy as np
 
+cdef extern from "utf8.h":
+    ctypedef char utf8_char_t;
+
 cdef extern from "xds.h":
     ctypedef struct xds_t:
         int state;
@@ -49,6 +52,7 @@ cdef extern from "caption.h":
     cdef void caption_frame_init(caption_frame_t*frame);
     libcaption_stauts_t caption_frame_decode(caption_frame_t*frame, uint16_t cc_data, double timestamp);
     void caption_frame_dump(caption_frame_t*frame);
+    int caption_frame_from_text(caption_frame_t * frame, const utf8_char_t * data);
 
 cdef extern from "scc.h":
     ctypedef struct scc_t:
@@ -105,6 +109,7 @@ cdef extern from "mpeg.h":
     void sei_init(sei_t*sei, double timestamp);
     libcaption_stauts_t sei_parse(sei_t*sei, const uint8_t*data, size_t size, double timestamp);
     libcaption_stauts_t sei_from_caption_frame(sei_t* sei, caption_frame_t* frame);
+    libcaption_stauts_t sei_from_caption_clear(sei_t * sei);
     sei_message_t* sei_message_next(sei_message_t* msg);
     uint8_t* sei_message_data(sei_message_t* msg);
     size_t sei_message_size(sei_message_t* msg);
@@ -186,3 +191,9 @@ cdef extern from "srt.h":
     ctypedef vtt_block_t srt_cue_t
     srt_t* srt_parse(const uint8_t* data, size_t size);
     int srt_cue_to_caption_frame(srt_cue_t* cue, caption_frame_t* frame)
+
+cdef extern from "eia608_encoder.h":
+    libcaption_stauts_t sei_for_display(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_padding(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_clear(sei_t * sei, int cc_count);
+    libcaption_stauts_t sei_for_captions(sei_t * sei, caption_frame_t * frame, int cc_count);
