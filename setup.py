@@ -26,9 +26,9 @@ class LibcaptionBuildExt(build_ext.build_ext):
             subprocess.check_call(cmd.split(' '), cwd=abs_path)
 
         # comment logging on stderr
-        call('sed -i /^\s*fprintf(stderr.*;$/s|^|//|;/^\s*fprintf(stderr/,/);$/s|^|//| %s' % os.path.join(abs_path,'src/cea708.c'))
-        call('sed -i /^\s*fprintf(stderr.*;$/s|^|//|;/^\s*fprintf(stderr/,/);$/s|^|//| %s' % os.path.join(abs_path,'src/eia608.c'))
-        call('sed -i /^\s*fprintf(stderr.*;$/s|^|//|;/^\s*fprintf(stderr/,/);$/s|^|//| %s' % os.path.join(abs_path,'src/mpeg.c'))
+        for file in ["cea708.c", "eia608.c", "mpeg.c"]:
+            call('sed -i /^\s*fprintf(stderr.*;$/s|^|//|;/^\s*fprintf(stderr/,/);$/s|^|//| %s' % os.path.join(abs_path,
+                                                                                                              'src/', file))
         # Run the autotools/make build to generate a python extension module
         call('cmake -DENABLE_RE2C=OFF -DCMAKE_C_FLAGS=-fPIC .')
         call('make -j%s' % (multiprocessing.cpu_count()))
