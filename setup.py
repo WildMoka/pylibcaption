@@ -17,7 +17,6 @@ libcaption_extension = Extension(
     include_dirs=["libcaption/caption"]
 )
 
-
 class LibcaptionBuildExt(build_ext.build_ext):
     def build_libcaption_static_lib(self):
         # Run configure/make
@@ -26,6 +25,10 @@ class LibcaptionBuildExt(build_ext.build_ext):
         def call(cmd):
             subprocess.check_call(cmd.split(' '), cwd=abs_path)
 
+        # comment logging on stderr
+        for file in ["cea708.c", "eia608.c", "mpeg.c"]:
+            call('sed -i /^\s*fprintf(stderr.*;$/s|^|//|;/^\s*fprintf(stderr/,/);$/s|^|//| %s' % os.path.join(abs_path,
+                                                                                                              'src/', file))
         # Run the autotools/make build to generate a python extension module
         call('cmake -DENABLE_RE2C=OFF -DCMAKE_C_FLAGS=-fPIC .')
         call('make -j%s' % (multiprocessing.cpu_count()))
@@ -43,7 +46,7 @@ setup(name="pylibcaption",
       description="Wrapper module for libcaption using numpy arrays interface",
       author="r3gis3r",
       author_email="regis@wildmoka.com",
-      version="0.0.3",
+      version="0.0.4",
       long_description=long_description,
       long_description_content_type="text/markdown",
       url="https://github.com/wildmoka/pylibcaption",
