@@ -138,6 +138,7 @@ def sub_to_eia(srt_data, timestamp):
     lib.caption_frame_from_text(&frame, srt_data)
     lib.sei_from_caption_frame(&sei, &frame)
     output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
 
     return output
 
@@ -149,6 +150,7 @@ def clear_eia(timestamp, frame_rate):
     cc_count = get_cc_count_from_rate(frame_rate)
     lib.sei_for_clear(&sei, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
 
     return output
 
@@ -161,6 +163,7 @@ def text_to_eia(text, timestamp, frame_rate):
     cc_count = get_cc_count_from_rate(frame_rate)
     lib.sei_for_captions(&sei, &frame, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
 
     return output
 
@@ -171,6 +174,7 @@ def padding(timestamp, frame_rate):
     cc_count = get_cc_count_from_rate(frame_rate)
     lib.sei_for_padding(&sei, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
 
     return output
 
@@ -181,5 +185,6 @@ def display_sub(timestamp, frame_rate):
     cc_count = get_cc_count_from_rate(frame_rate)
     lib.sei_for_display(&sei, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
 
     return output
