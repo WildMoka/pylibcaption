@@ -115,6 +115,7 @@ cdef extern from "mpeg.h":
     size_t sei_message_size(sei_message_t* msg);
     sei_msgtype_t sei_message_type(sei_message_t* msg);
     void sei_dump(sei_t*sei);
+    void sei_free(sei_t*sei);
 
 cdef extern from "cea708.h":
     ctypedef enum cea708_cc_type_t:
