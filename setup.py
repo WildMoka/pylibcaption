@@ -17,6 +17,7 @@ libcaption_extension = Extension(
     include_dirs=["libcaption/caption"]
 )
 
+
 class LibcaptionBuildExt(build_ext.build_ext):
     def build_libcaption_static_lib(self):
         # Run configure/make
@@ -35,6 +36,12 @@ class LibcaptionBuildExt(build_ext.build_ext):
 
     def run(self):
         self.build_libcaption_static_lib()
+
+        # Import numpy here, only when headers are needed
+        import numpy
+        # Add numpy headers to include_dirs
+        self.include_dirs.append(numpy.get_include())
+
         # Call super
         build_ext.build_ext.run(self)
 
@@ -46,7 +53,7 @@ setup(name="pylibcaption",
       description="Wrapper module for libcaption using numpy arrays interface",
       author="r3gis3r",
       author_email="regis@wildmoka.com",
-      version="0.0.5",
+      version="0.0.6",
       long_description=long_description,
       long_description_content_type="text/markdown",
       url="https://github.com/wildmoka/pylibcaption",
@@ -56,7 +63,7 @@ setup(name="pylibcaption",
       cmdclass={
           "build_ext": LibcaptionBuildExt,
       },
-
+      install_requires=['numpy'],
       classifiers=[
           "Development Status :: 3 - Alpha",
           "Intended Audience :: Developers",
