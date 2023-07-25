@@ -20,6 +20,11 @@ CDP_TABLE_PER_FRAME_RATE = {
     Fraction(60, 1): {"cc_count": 10, "cea_608": 2, "cea_708": 18}
 }
 
+CC_TYPE_NTSC_CC_FIELD_1 = lib.cea708_cc_type_t.cc_type_ntsc_cc_field_1
+CC_TYPE_NTSC_CC_FIELD_2 = lib.cea708_cc_type_t.cc_type_ntsc_cc_field_2
+CC_CHANNEL_0 = 0
+CC_CHANNEL_1 = 1
+
 
 def get_cc_count_from_rate(frame_rate):
     cdp_table = CDP_TABLE_PER_FRAME_RATE.get(frame_rate)
@@ -184,6 +189,52 @@ def display_sub(timestamp, frame_rate):
     lib.sei_init(&sei, timestamp)
     cc_count = get_cc_count_from_rate(frame_rate)
     lib.sei_for_display(&sei, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
+
+    return output
+
+def better_eia_from_text(text, timestamp, frame_rate, cc_type=lib.cc_type_ntsc_cc_field_1, cc_channel=CC_CHANNEL_0):
+    cdef lib.caption_frame_t frame
+    cdef lib.sei_t sei
+    output = []
+
+    lib.caption_frame_from_text(&frame, text)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.better_sei_for_captions(&sei, &frame, cc_type, cc_channel, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
+
+    return output
+
+def better_eia_clear_cmd(timestamp, frame_rate, cc_type=lib.cc_type_ntsc_cc_field_1, cc_channel=CC_CHANNEL_0):
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.better_sei_for_clear(&sei, cc_type, cc_channel, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
+
+    return output
+
+def better_eia_padding_cmd(timestamp, frame_rate, cc_type=lib.cc_type_ntsc_cc_field_1, cc_channel=CC_CHANNEL_0):
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.better_sei_for_padding(&sei, cc_type, cc_channel, cc_count)
+    output = get_messages_from_sei(&sei, timestamp)
+    lib.sei_free(&sei)
+
+    return output
+
+def better_eia_display_cmd(timestamp, frame_rate, cc_type=lib.cc_type_ntsc_cc_field_1, cc_channel=CC_CHANNEL_0):
+    cdef lib.sei_t sei
+    output = []
+    lib.sei_init(&sei, timestamp)
+    cc_count = get_cc_count_from_rate(frame_rate)
+    lib.better_sei_for_display(&sei, cc_type, cc_channel, cc_count)
     output = get_messages_from_sei(&sei, timestamp)
     lib.sei_free(&sei)
 
