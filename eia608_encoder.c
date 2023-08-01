@@ -16,6 +16,7 @@ libcaption_stauts_t encode_cc(sei_t* sei, double timestamp, uint16_t cc_element,
     }
     // cea708_dump(&cea708);
     sei_append(sei, &cea708);
+    return LIBCAPTION_OK;
 }
 
 void sei_append(sei_t* sei, cea708_t* cea708)
@@ -52,7 +53,7 @@ libcaption_stauts_t sei_for_captions(sei_t* sei, caption_frame_t* frame, int cc_
 
     int r, c;
     int unl, prev_unl;
-    cea708_t cea708;
+//    cea708_t cea708;
     const char* data;
     uint16_t prev_cc_data;
     eia608_style_t styl, prev_styl;

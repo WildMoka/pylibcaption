@@ -10,7 +10,7 @@ from distutils.command import build_ext
 
 libcaption_extension = Extension(
     name="pylibcaption",
-    sources=["pylibcaption.pyx", "eia608_encoder.c"],
+    sources=["pylibcaption.pyx", "eia608_encoder.c", "better_eia608_encoder.c"],
     extra_objects=["./libcaption/libcaption.a"],
     libraries=["caption"],
     library_dirs=["libcaption"],
@@ -53,7 +53,7 @@ setup(name="pylibcaption",
       description="Wrapper module for libcaption using numpy arrays interface",
       author="r3gis3r",
       author_email="regis@wildmoka.com",
-      version="0.0.6",
+      version="0.0.7",
       long_description=long_description,
       long_description_content_type="text/markdown",
       url="https://github.com/wildmoka/pylibcaption",

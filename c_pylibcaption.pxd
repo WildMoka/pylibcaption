@@ -198,3 +198,10 @@ cdef extern from "eia608_encoder.h":
     libcaption_stauts_t sei_for_padding(sei_t * sei, int cc_count);
     libcaption_stauts_t sei_for_clear(sei_t * sei, int cc_count);
     libcaption_stauts_t sei_for_captions(sei_t * sei, caption_frame_t * frame, int cc_count);
+
+
+cdef extern from "better_eia608_encoder.h":
+    libcaption_stauts_t better_sei_for_display(sei_t * sei, cea708_cc_type_t type, int channel, int cc_count);
+    libcaption_stauts_t better_sei_for_padding(sei_t * sei, cea708_cc_type_t type, int channel, int cc_count);
+    libcaption_stauts_t better_sei_for_clear(sei_t * sei, cea708_cc_type_t type, int channel, int cc_count);
+    libcaption_stauts_t better_sei_for_captions(sei_t * sei, caption_frame_t * frame, cea708_cc_type_t type, int channel, int cc_count);
