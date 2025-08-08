@@ -1,0 +1,29 @@
+name: Submodules check
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    name: Check submodules update validity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check submodules update validity
+        id: run_action
+        continue-on-error: true
+        uses: WildMoka/ContinuousIntegration/actions/check_submodule_update@actions-v0.0.15
+        with:
+          TARGET_BRANCH: ${{ github.base_ref }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.FULL_READ_TOKEN }}
+      - name: Output summary
+        run: |
+          echo "Checked submodules update validity." >> $GITHUB_STEP_SUMMARY
+          echo "Pull request number: ${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "Destination branch: ${{ github.base_ref }}" >> $GITHUB_STEP_SUMMARY
+      - name: Failure notification
+        if: steps.run_action.outcome != 'success'
+        run: |
+          echo "Outcome: FAILURE. Check logs to find faulty submodule." >> $GITHUB_STEP_SUMMARY
+          exit 1
